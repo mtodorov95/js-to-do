@@ -1,0 +1,38 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do</title>
+    <link rel="stylesheet" href="./fontawesome-free-5.14.0-web/css/all.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <section class="section-center">
+        <form class='to-do-form'>
+            <p class="alert"></p>
+            <h3>to-do</h3>
+            <div class="form-control">
+                <input type="text" id="to-do" placeholder="e.g study">
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
+        </form>
+        <div class="to-do-container">
+            <div class="to-do-list">
+                <article class="to-do-item">
+                    <p class="title">Item</p>
+                    <div class="btn-container">
+                        <button type="button" class="edit-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="delete-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </article>
+            </div>
+            <button type="button" class="clear-btn">Clear all</button>
+        </div>
+    </section>
+</body>
+<script src="./js/app.js"></script>
+</html>
