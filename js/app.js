@@ -12,6 +12,7 @@ let editFlag = false;
 let editId = "";
 
 form.addEventListener('submit', addItem);
+clearBtn.addEventListener('click', clearAll);
 
 
 function addItem(event){
@@ -40,6 +41,10 @@ function addItem(event){
         displayAlert('Item added', 'success');
         // show the list
         to_do_container.classList.add('show-container');
+        // local storage
+        addToLocalStorage(id, value);
+        // default
+        setBackToDefault();
     }
     else if(value&&editFlag){
         console.log('editing');
@@ -59,4 +64,30 @@ function displayAlert(text, type){
         alert.textContent = '';
         alert.classList.remove(`alert-${type}`);
     }, 1000)
+}
+
+function setBackToDefault(){
+    to_do.value = '';
+    editFlag = false;
+    editId = '';
+    submitBtn.textContent = 'submit';
+}
+
+function clearAll(){
+    const items = document.querySelectorAll('.to-do-item');
+    if (items.length > 0){
+        items.forEach(function(item){
+            list.removeChild(item);
+        })
+    }
+    to_do_container.classList.remove('show-container');
+    displayAlert('Empty list', 'danger');
+    // localStorage.removeItem('list');
+    setBackToDefault();
+}
+
+
+
+function addToLocalStorage(id, value){
+    console.log('Added locally');
 }
