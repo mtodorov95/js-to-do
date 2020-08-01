@@ -14,40 +14,25 @@ let editId = "";
 form.addEventListener('submit', addItem);
 clearBtn.addEventListener('click', clearAll);
 
+window.addEventListener('DOMContentLoaded', loadItems);
+
 
 function addItem(event){
     event.preventDefault();
     const value = to_do.value;
-    const id = new Date().getTime().toString(); // unique id gen
+    const id = new Date().getTime().toString();
     if (value&&!editFlag){
-        // create the article with class and unique id
-        const element = document.createElement('article');
-        element.classList.add('to-do-item');
-        const attr = document.createAttribute('data-id');
-        attr.value = id;
-        element.setAttributeNode(attr);
-        element.innerHTML = `<p class="title">${value}</p>
-        <div class="btn-container">
-            <button type="button" class="edit-btn">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="delete-btn">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>`;
-        // append child
-        list.appendChild(element);
-        // alert
-        displayAlert('Item added', 'success');
-        // show the list
+        createItem(id, value);
+        displayAlert('Item Added', 'success');
         to_do_container.classList.add('show-container');
-        // local storage
-        addToLocalStorage(id, value);
-        // default
+        addLocal(id, value);
         setBackToDefault();
     }
     else if(value&&editFlag){
-        console.log('editing');
+        editElement.innerHTML = value;
+        displayAlert('Editted', 'success');
+        editLocal(editId, value);
+        setBackToDefault();
     }
     else{
         displayAlert('Enter a task', 'danger');
@@ -55,11 +40,9 @@ function addItem(event){
 }
 
 function displayAlert(text, type){
-    // add msg and class to the alert
     alert.textContent = text;
     alert.classList.add(`alert-${type}`);
 
-    // hide the alert
     setTimeout(function(){
         alert.textContent = '';
         alert.classList.remove(`alert-${type}`);
@@ -70,7 +53,7 @@ function setBackToDefault(){
     to_do.value = '';
     editFlag = false;
     editId = '';
-    submitBtn.textContent = 'submit';
+    submitBtn.innerHTML = '<i class="fas fa-plus"></i>';
 }
 
 function clearAll(){
@@ -81,13 +64,96 @@ function clearAll(){
         })
     }
     to_do_container.classList.remove('show-container');
-    displayAlert('Empty list', 'danger');
-    // localStorage.removeItem('list');
+    displayAlert('Cleared', 'danger');
+    localStorage.removeItem('list');
     setBackToDefault();
+}
+
+function deleteItem(event){
+    const item = event.currentTarget.parentElement.parentElement;
+    const id = item.dataset.id;
+    list.removeChild(item);
+    if (list.children.length === 0){
+        to_do_container.classList.remove('show-container');
+    }
+    displayAlert("Removed", 'danger');
+    setBackToDefault();
+    removeLocal(id);
+}
+
+function editItem(){
+    const item = event.currentTarget.parentElement.parentElement;
+    editElement = event.currentTarget.parentElement.previousElementSibling;
+    to_do.value = editElement.innerHTML;
+    editFlag = true;
+    editId = item.dataset.id;
+    submitBtn.innerHTML = '<i class="fas fa-edit"></i>';
 }
 
 
 
-function addToLocalStorage(id, value){
-    console.log('Added locally');
+function addLocal(id, value){
+    const item = {id,value};
+    let items = getLocal();
+    items.push(item);
+    localStorage.setItem('list', JSON.stringify(items));
+}
+
+function removeLocal(id){
+    let items = getLocal();
+    items = items.filter(function(item){
+        if (item.id !== id){
+            return item;
+        }
+    });
+    localStorage.setItem('list', JSON.stringify(items));
+}
+
+function editLocal(id, value){
+    let items = getLocal();
+    items = items.map(function(item){
+        if (item.id === id){
+            item.value = value;
+        }
+        return item;
+    });
+    localStorage.setItem('list', JSON.stringify(items));
+}
+
+
+function loadItems(){
+    let items = getLocal();
+    if (items.length > 0){
+        items.forEach(function(item){
+            createItem(item.id, item.value);
+        });
+        to_do_container.classList.add('show-container');
+    }
+}
+
+
+function getLocal(){
+    return localStorage.getItem('list') ? JSON.parse(localStorage.getItem('list')): [];
+}
+
+function createItem(id ,value){
+    const item = document.createElement('article');
+        item.classList.add('to-do-item');
+        const attr = document.createAttribute('data-id');
+        attr.value = id;
+        item.setAttributeNode(attr);
+        item.innerHTML = `<p class="title">${value}</p>
+        <div class="btn-container">
+            <button type="button" class="edit-btn">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="delete-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>`;
+        const deleteBtn = item.querySelector('.delete-btn');
+        const editBtn = item.querySelector('.edit-btn');
+        deleteBtn.addEventListener('click', deleteItem);
+        editBtn.addEventListener('click', editItem);
+        list.appendChild(item);
 }
